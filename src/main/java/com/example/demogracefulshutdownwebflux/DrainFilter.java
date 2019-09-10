@@ -45,8 +45,11 @@ public class DrainFilter implements WebFilter {
     void preDestroy() {
         log.info("Start draining. ({} in-flight requests)", this.inFlight);
         this.inDraining.set(true);
-        int current;
-        while ((current = this.inFlight.get()) > 0) {
+        for (int i = 0; i < 5000; i++) {
+            int current = this.inFlight.get();
+            if (current <= 0) {
+                break;
+            }
             try {
                 log.info("Draining... ({} in-flight requests)", current);
                 Thread.sleep(100);
